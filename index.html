@@ -1,378 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farcaster Mini-App - Ultimate Cosmic Hub</title>
-    <!-- Google Fonts: Space Mono for futuristic vibe -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Chart.js for graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- GSAP for god-tier animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- Three.js for 3D profile effect -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Space Mono', monospace;
+<script>
+    // Mock data (replace with API if you have one)
+    const followerData = {
+        realFollowers: 10000,
+        filteredFollowers: 9200,
+        changes: {
+            last24h: [9600, 9700, 9800, 9900, 9950, 10000],
+            last7d: [9000, 9200, 9400, 9600, 9700, 9800, 10000],
+            last30d: [8000, 8500, 8800, 9000, 9500, 9700, 10000]
         }
+    };
 
-        body {
-            background: #0a0a14; /* Solid deep space black-blue */
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            overflow: hidden;
-        }
+    // GSAP animations
+    gsap.from('.container', { scale: 0.7, opacity: 0, duration: 2, ease: 'power4.out' });
+    gsap.from('.profile-pic', { y: -300, opacity: 0, duration: 1.2, ease: 'bounce.out', delay: 0.5 });
+    gsap.from('.profile h2', { x: -200, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.8 });
+    gsap.from('.profile p', { x: 200, opacity: 0, duration: 1, ease: 'power3.out', delay: 1 });
+    gsap.from('.follower-box', { scale: 0, opacity: 0, duration: 1.5, stagger: 0.3, ease: 'elastic.out(1, 0.4)', delay: 1.2 });
+    gsap.from('.charts', { y: 300, opacity: 0, duration: 1.5, ease: 'power4.out', delay: 1.5 });
 
-        .container {
-            background: rgba(20, 20, 40, 0.95);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 1100px;
-            width: 100%;
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.4);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(12px);
-            z-index: 1;
-        }
+    // Animate follower counts
+    gsap.fromTo(
+        '#real-followers',
+        { innerText: 0 },
+        { innerText: followerData.realFollowers, duration: 3, ease: 'power2.out', snap: { innerText: 1 } }
+    );
+    gsap.fromTo(
+        '#filtered-followers',
+        { innerText: 0 },
+        { innerText: followerData.filteredFollowers, duration: 3, ease: 'power2.out', snap: { innerText: 1 } }
+    );
 
-        /* Neon border glow */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 30px;
-            background: linear-gradient(45deg, #00ff88, #ff00ff, #00ff88);
-            z-index: -1;
-            filter: blur(8px);
-            animation: neonGlow 4s infinite linear;
-        }
-
-        @keyframes neonGlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        /* Profile section */
-        .profile {
-            text-align: center;
-            margin-bottom: 60px;
-            position: relative;
-        }
-
-        #profile-canvas {
-            width: 180px !important;
-            height: 180px !important;
-            margin: 0 auto;
-            border-radius: 50%;
-            border: 6px solid #00ff88;
-            transition: border-color 0.3s ease;
-        }
-
-        #profile-canvas:hover {
-            border-color: #ff00ff;
-        }
-
-        .profile h2 {
-            font-size: 34px;
-            margin: 25px 0 10px;
-            color: #00ff88;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.9);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .profile p {
-            font-size: 20px;
-            color: #b0b0ff;
-            text-shadow: 0 0 8px rgba(176, 176, 255, 0.6);
-        }
-
-        /* Followers section */
-        .followers {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 60px;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-
-        .follower-box {
-            background: linear-gradient(135deg, rgba(50, 50, 80, 0.9), rgba(30, 30, 60, 0.7));
-            padding: 30px;
-            border-radius: 25px;
-            text-align: center;
-            min-width: 200px;
-            position: relative;
-            transition: transform 0.3s ease;
-            overflow: hidden;
-        }
-
-        .follower-box::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .follower-box:hover::after {
-            opacity: 1;
-        }
-
-        .follower-box:hover {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
-        }
-
-        .follower-box h3 {
-            font-size: 22px;
-            color: #00ff88;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-
-        .follower-box p {
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        /* Chart section */
-        .charts {
-            background: rgba(40, 40, 70, 0.9);
-            padding: 30px;
-            border-radius: 25px;
-            margin-top: 40px;
-            position: relative;
-        }
-
-        .charts h3 {
-            font-size: 28px;
-            margin-bottom: 30px;
-            color: #00ff88;
-            text-shadow: 0 0 12px rgba(0, 255, 136, 0.7);
-            letter-spacing: 2px;
-        }
-
-        canvas {
-            max-width: 100%;
-            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4));
-        }
-
-        /* Time toggle buttons */
-        .time-toggle {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .time-btn {
-            background: rgba(0, 255, 136, 0.2);
-            border: 2px solid #00ff88;
-            color: #00ff88;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .time-btn:hover, .time-btn.active {
-            background: #00ff88;
-            color: #0a0a14;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px;
-            }
-
-            #profile-canvas {
-                width: 140px !important;
-                height: 140px !important;
-            }
-
-            .profile h2 {
-                font-size: 28px;
-            }
-
-            .follower-box {
-                min-width: 160px;
-            }
-
-            .time-btn {
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Profile section with 3D effect -->
-        <div class="profile">
-            <div id="profile-canvas"></div>
-            <h2>Cosmic Farcaster Overlord</h2>
-            <p>Conquering the digital galaxy, one vibe at a time.</p>
-        </div>
-
-        <!-- Followers section -->
-        <div class="followers">
-            <div class="follower-box">
-                <h3>Real Followers</h3>
-                <p id="real-followers">0</p>
-            </div>
-            <div class="follower-box">
-                <h3>Filtered Followers</h3>
-                <p id="filtered-followers">0</p>
-            </div>
-        </div>
-
-        <!-- Chart section -->
-        <div class="charts">
-            <h3>Follower Growth</h3>
-            <div class="time-toggle">
-                <button class="time-btn active" data-time="24h">24h</button>
-                <button class="time-btn" data-time="7d">7d</button>
-                <button class="time-btn" data-time="30d">30d</button>
-            </div>
-            <canvas id="follower-chart"></canvas>
-        </div>
-    </div>
-
-    <script>
-        // Mock data (replace with API if you got one)
-        const followerData = {
-            realFollowers: 5000,
-            filteredFollowers: 4500,
-            changes: {
-                last24h: [4800, 4850, 4900, 4950, 4980, 5000],
-                last7d: [4500, 4600, 4700, 4800, 4850, 4900, 5000],
-                last30d: [4000, 4200, 4300, 4400, 4600, 4800, 5000]
-            }
-        };
-
-        // 3D Profile effect with Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(180, 180);
-        document.getElementById('profile-canvas').appendChild(renderer.domElement);
-
-        const geometry = new THREE.SphereGeometry(1, 32, 32);
-        const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('https://via.placeholder.com/150');
-        const material = new THREE.MeshBasicMaterial({ map: texture });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        camera.position.z = 2;
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            sphere.rotation.y += 0.01;
-            renderer.render(scene, camera);
-        }
-        animate3D();
-
-        // GSAP animations
-        gsap.from('.container', { scale: 0.8, opacity: 0, duration: 1.5, ease: 'power4.out' });
-        gsap.from('#profile-canvas', { y: -200, opacity: 0, duration: 1, ease: 'bounce.out', delay: 0.5 });
-        gsap.from('.profile h2', { x: -100, opacity: 0, duration: 1, ease: 'power2.out', delay: 0.7 });
-        gsap.from('.profile p', { x: 100, opacity: 0, duration: 1, ease: 'power2.out', delay: 0.9 });
-        gsap.from('.follower-box', { scale: 0, opacity: 0, duration: 1, stagger: 0.2, ease: 'elastic.out(1, 0.5)', delay: 1 });
-        gsap.from('.charts', { y: 200, opacity: 0, duration: 1, ease: 'power2.out', delay: 1.2 });
-
-        // Animate follower counts
-        gsap.fromTo(
-            '#real-followers',
-            { innerText: 0 },
-            { innerText: followerData.realFollowers, duration: 2.5, ease: 'power2.out', snap: { innerText: 1 } }
-        );
-        gsap.fromTo(
-            '#filtered-followers',
-            { innerText: 0 },
-            { innerText: followerData.filteredFollowers, duration: 2.5, ease: 'power2.out', snap: { innerText: 1 } }
-        );
-
-        // Chart setup
-        const ctx = document.getElementById('follower-chart').getContext('2d');
-        let followerChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
-                datasets: [
-                    {
-                        label: 'Real Followers',
-                        data: followerData.changes.last24h,
-                        borderColor: '#00ff88',
-                        backgroundColor: 'rgba(0, 255, 136, 0.4)',
-                        fill: true,
-                        tension: 0.5,
-                        pointBackgroundColor: '#ff00ff',
-                        pointBorderColor: '#fff',
-                        pointRadius: 6,
-                        pointHoverRadius: 10
+    // Custom Chart.js plugin for glowing points
+    const glowPlugin = {
+        id: 'glowPlugin',
+        beforeDraw(chart) {
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach(dataset => {
+                dataset.data.forEach((value, index) => {
+                    const meta = chart.getDatasetMeta(0);
+                    const point = meta.data[index];
+                    if (point) {
+                        ctx.beginPath();
+                        ctx.arc(point.x, point.y, 12, 0, 2 * Math.PI);
+                        ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
+                        ctx.fill();
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        ticks: { color: '#b0b0ff', font: { size: 16 } },
-                        grid: { color: 'rgba(0, 255, 136, 0.2)' }
+                });
+            });
+        }
+    };
+
+    // Chart setup
+    Chart.register(glowPlugin);
+    const ctx = document.getElementById('chart-canvas').getContext('2d');
+    let followerChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
+            datasets: [
+                {
+                    label: 'Real Followers',
+                    data: followerData.changes.last24h,
+                    borderColor: '#ff00ff',
+                    backgroundColor: 'rgba(255, 0, 255, 0.5)',
+                    fill: true,
+                    tension: 0.6,
+                    pointBackgroundColor: '#00ff88',
+                    pointBorderColor: '#fff',
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointStyle: 'circle'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: { 
+                        color: '#00ff88', 
+                        font: { size: 18 },
+                        callback: value => value.toLocaleString()
                     },
-                    x: {
-                        ticks: { color: '#b0b0ff', font: { size: 16 } },
-                        grid: { color: 'rgba(0, 255, 136, 0.2)' }
-                    }
+                    grid: { color: 'rgba(255, 0, 255, 0.2)' }
                 },
-                plugins: {
-                    legend: {
-                        labels: { color: '#fff', font: { size: 18 } }
-                    }
+                x: {
+                    ticks: { color: '#00ff88', font: { size: 18 } },
+                    grid: { color: 'rgba(255, 0, 255, 0.2)' }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#ff00ff', font: { size: 20 } }
                 },
-                animation: {
-                    duration: 2500,
-                    easing: 'easeOutElastic'
+                tooltip: {
+                    backgroundColor: 'rgba(10, 10, 20, 0.9)',
+                    titleColor: '#ff00ff',
+                    bodyColor: '#00ff88',
+                    borderColor: '#ff00ff',
+                    borderWidth: 2
+                }
+            },
+            animation: {
+                duration: 3000,
+                easing: 'easeOutBounce',
+                onComplete: () => {
+                    gsap.to('#chart-canvas', { scale: 1.02, duration: 0.5, yoyo: true, repeat: 1 });
                 }
             }
-        });
+        },
+        plugins: [glowPlugin]
+    });
 
-        // Time toggle functionality
-        const timeButtons = document.querySelectorAll('.time-btn');
-        timeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                timeButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const timeFrame = btn.dataset.time;
-                followerChart.data.datasets[0].data = followerData.changes[`last${timeFrame}`];
-                followerChart.update();
-                gsap.from('.charts canvas', { scale: 0.95, opacity: 0.5, duration: 0.5, ease: 'power2.out' });
+    // Time toggle functionality
+    const timeButtons = document.querySelectorAll('.time-btn');
+    timeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            timeButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const timeFrame = btn.dataset.time;
+            followerChart.data.datasets[0].data = followerData.changes[`last${timeFrame}`];
+            followerChart.update();
+            gsap.from('#chart-canvas', { 
+                scale: 0.9, 
+                opacity: 0.7, 
+                duration: 0.7, 
+                ease: 'power3.out',
+                filter: 'drop-shadow(0 0 30px rgba(255, 0, 255, 0.8))'
             });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
