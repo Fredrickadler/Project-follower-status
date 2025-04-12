@@ -1,134 +1,378 @@
-<script>
-    // Mock data (replace with API if you have one)
-    const followerData = {
-        realFollowers: 10000,
-        filteredFollowers: 9200,
-        changes: {
-            last24h: [9600, 9700, 9800, 9900, 9950, 10000],
-            last7d: [9000, 9200, 9400, 9600, 9700, 9800, 10000],
-            last30d: [8000, 8500, 8800, 9000, 9500, 9700, 10000]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farcaster Mini-App - Chart Legend</title>
+    <!-- Google Fonts: Rajdhani -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
         }
-    };
 
-    // GSAP animations
-    gsap.from('.container', { scale: 0.7, opacity: 0, duration: 2, ease: 'power4.out' });
-    gsap.from('.profile-pic', { y: -300, opacity: 0, duration: 1.2, ease: 'bounce.out', delay: 0.5 });
-    gsap.from('.profile h2', { x: -200, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.8 });
-    gsap.from('.profile p', { x: 200, opacity: 0, duration: 1, ease: 'power3.out', delay: 1 });
-    gsap.from('.follower-box', { scale: 0, opacity: 0, duration: 1.5, stagger: 0.3, ease: 'elastic.out(1, 0.4)', delay: 1.2 });
-    gsap.from('.charts', { y: 300, opacity: 0, duration: 1.5, ease: 'power4.out', delay: 1.5 });
+        body {
+            background: #00ff88; /* Solid neon green */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    // Animate follower counts
-    gsap.fromTo(
-        '#real-followers',
-        { innerText: 0 },
-        { innerText: followerData.realFollowers, duration: 3, ease: 'power2.out', snap: { innerText: 1 } }
-    );
-    gsap.fromTo(
-        '#filtered-followers',
-        { innerText: 0 },
-        { innerText: followerData.filteredFollowers, duration: 3, ease: 'power2.out', snap: { innerText: 1 } }
-    );
+        .container {
+            background: rgba(10, 10, 20, 0.9);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 1100px;
+            width: 100%;
+            box-shadow: 0 0 60px rgba(255, 0, 255, 0.5); /* Pink glow */
+            position: relative;
+        }
 
-    // Custom Chart.js plugin for glowing points
-    const glowPlugin = {
-        id: 'glowPlugin',
-        beforeDraw(chart) {
-            const ctx = chart.ctx;
-            chart.data.datasets.forEach(dataset => {
-                dataset.data.forEach((value, index) => {
-                    const meta = chart.getDatasetMeta(0);
-                    const point = meta.data[index];
-                    if (point) {
+        /* Neon pink border */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 30px;
+            background: linear-gradient(90deg, #ff00ff, #00ff88, #ff00ff);
+            filter: blur(8px);
+            animation: neonPulse 3s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes neonPulse {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
+        }
+
+        /* Profile section */
+        .profile {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 6px solid #ff00ff;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.6));
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+            border-color: #00ff88;
+        }
+
+        .profile h2 {
+            font-size: 36px;
+            margin: 25px 0 10px;
+            color: #ff00ff;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .profile p {
+            font-size: 20px;
+            color: #00ff88;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+        }
+
+        /* Followers section */
+        .followers {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .follower-box {
+            background: rgba(20, 20, 40, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+
+        .follower-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+        }
+
+        .follower-box h3 {
+            font-size: 22px;
+            color: #ff00ff;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .follower-box p {
+            font-size: 32px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        /* Chart section */
+        .charts {
+            background: rgba(20, 20, 50, 0.9);
+            padding: 40px;
+            border-radius: 25px;
+            margin-top: 40px;
+        }
+
+        .charts h3 {
+            font-size: 30px;
+            margin-bottom: 30px;
+            color: #ff00ff;
+            text-shadow: 0 0 12px rgba(255, 0, 255, 0.7);
+            text-align: center;
+        }
+
+        .time-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .time-btn {
+            background: rgba(255, 0, 255, 0.2);
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover, .time-btn.active {
+            background: #ff00ff;
+            color: #00ff88;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.7);
+        }
+
+        #chart-canvas {
+            max-width: 100%;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.4));
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+
+            .profile-pic {
+                width: 140px;
+                height: 140px;
+            }
+
+            .profile h2 {
+                font-size: 28px;
+            }
+
+            .follower-box {
+                min-width: 160px;
+            }
+
+            .charts h3 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile section -->
+        <div class="profile">
+            <img class="profile-pic" src="https://via.placeholder.com/180" alt="Profile Picture">
+            <h2>Farcaster Chart Master</h2>
+            <p>Owning the social universe with neon swagger.</p>
+        </div>
+
+        <!-- Followers section -->
+        <div class="followers">
+            <div class="follower-box">
+                <h3>Real Followers</h3>
+                <p id="real-followers">0</p>
+            </div>
+            <div class="follower-box">
+                <h3>Filtered Followers</h3>
+                <p id="filtered-followers">0</p>
+            </div>
+        </div>
+
+        <!-- Chart section -->
+        <div class="charts">
+            <h3>Follower Explosion</h3>
+            <div class="time-toggle">
+                <button class="time-btn active" data-time="24h">24H</button>
+                <button class="time-btn" data-time="7d">7D</button>
+                <button class="time-btn" data-time="30d">30D</button>
+            </div>
+            <canvas id="chart-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        console.log("Loading Farcaster Mini-App...");
+
+        // Mock data
+        const followerData = {
+            realFollowers: 15000,
+            filteredFollowers: 13800,
+            changes: {
+                last24h: [14500, 14600, 14750, 14900, 14950, 15000],
+                last7d: [13500, 13800, 14000, 14200, 14500, 14700, 15000],
+                last30d: [12000, 12500, 13000, 13500, 14000, 14500, 15000]
+            }
+        };
+
+        // GSAP animations
+        try {
+            gsap.from('.container', { scale: 0.8, opacity: 0, duration: 1.5, ease: 'power4.out' });
+            gsap.from('.profile-pic', { y: -200, opacity: 0, duration: 1, ease: 'bounce.out', delay: 0.5 });
+            gsap.from('.profile h2', { x: -150, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.7 });
+            gsap.from('.profile p', { x: 150, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.9 });
+            gsap.from('.follower-box', { scale: 0, opacity: 0, duration: 1, stagger: 0.2, ease: 'elastic.out(1, 0.5)', delay: 1 });
+            gsap.from('.charts', { y: 200, opacity: 0, duration: 1, ease: 'power4.out', delay: 1.2 });
+            gsap.fromTo(
+                '#real-followers',
+                { innerText: 0 },
+                { innerText: followerData.realFollowers, duration: 2, ease: 'power2.out', snap: { innerText: 1 } }
+            );
+            gsap.fromTo(
+                '#filtered-followers',
+                { innerText: 0 },
+                { innerText: followerData.filteredFollowers, duration: 2, ease: 'power2.out', snap: { innerText: 1 } }
+            );
+            console.log("GSAP animations loaded successfully.");
+        } catch (e) {
+            console.error("GSAP error:", e);
+        }
+
+        // Custom Chart.js plugin for particle effects
+        const particlePlugin = {
+            id: 'particlePlugin',
+            beforeDraw(chart) {
+                const ctx = chart.ctx;
+                const meta = chart.getDatasetMeta(0);
+                meta.data.forEach(point => {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 15, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'rgba(255, 0, 255, 0.2)';
+                    ctx.fill();
+                    // Mini particles
+                    for (let i = 0; i < 3; i++) {
+                        const angle = Math.random() * 2 * Math.PI;
+                        const dist = Math.random() * 10 + 5;
                         ctx.beginPath();
-                        ctx.arc(point.x, point.y, 12, 0, 2 * Math.PI);
-                        ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
+                        ctx.arc(point.x + Math.cos(angle) * dist, point.y + Math.sin(angle) * dist, 2, 0, 2 * Math.PI);
+                        ctx.fillStyle = 'rgba(0, 255, 136, 0.5)';
                         ctx.fill();
                     }
+                    ctx.restore();
+                });
+            }
+        };
+
+        // Chart setup
+        try {
+            Chart.register(particlePlugin);
+            const ctx = document.getElementById('chart-canvas').getContext('2d');
+            let followerChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
+                    datasets: [
+                        {
+                            label: 'Real Followers',
+                            data: followerData.changes.last24h,
+                            borderColor: '#ff00ff',
+                            backgroundColor: 'rgba(255, 0, 255, 0.4)',
+                            fill: true,
+                            tension: 0.7,
+                            pointBackgroundColor: '#00ff88',
+                            pointBorderColor: '#fff',
+                            pointRadius: 10,
+                            pointHoverRadius: 15
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { 
+                                color: '#00ff88', 
+                                font: { size: 16 },
+                                callback: value => value.toLocaleString()
+                            },
+                            grid: { color: 'rgba(255, 0, 255, 0.3)' }
+                        },
+                        x: {
+                            ticks: { color: '#00ff88', font: { size: 16 } },
+                            grid: { color: 'rgba(255, 0, 255, 0.3)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ff00ff', font: { size: 18 } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 20, 0.9)',
+                            titleColor: '#ff00ff',
+                            bodyColor: '#00ff88',
+                            borderColor: '#ff00ff',
+                            borderWidth: 2
+                        }
+                    },
+                    animation: {
+                        duration: 2500,
+                        easing: 'easeOutElastic'
+                    }
+                },
+                plugins: [particlePlugin]
+            });
+
+            // Time toggle
+            const timeButtons = document.querySelectorAll('.time-btn');
+            timeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    timeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const timeFrame = btn.dataset.time;
+                    followerChart.data.datasets[0].data = followerData.changes[`last${timeFrame}`];
+                    followerChart.update();
+                    gsap.from('#chart-canvas', { scale: 0.95, opacity: 0.8, duration: 0.5, ease: 'power3.out' });
                 });
             });
+
+            console.log("Chart loaded successfully.");
+        } catch (e) {
+            console.error("Chart error:", e);
         }
-    };
-
-    // Chart setup
-    Chart.register(glowPlugin);
-    const ctx = document.getElementById('chart-canvas').getContext('2d');
-    let followerChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
-            datasets: [
-                {
-                    label: 'Real Followers',
-                    data: followerData.changes.last24h,
-                    borderColor: '#ff00ff',
-                    backgroundColor: 'rgba(255, 0, 255, 0.5)',
-                    fill: true,
-                    tension: 0.6,
-                    pointBackgroundColor: '#00ff88',
-                    pointBorderColor: '#fff',
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    pointStyle: 'circle'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: { 
-                        color: '#00ff88', 
-                        font: { size: 18 },
-                        callback: value => value.toLocaleString()
-                    },
-                    grid: { color: 'rgba(255, 0, 255, 0.2)' }
-                },
-                x: {
-                    ticks: { color: '#00ff88', font: { size: 18 } },
-                    grid: { color: 'rgba(255, 0, 255, 0.2)' }
-                }
-            },
-            plugins: {
-                legend: {
-                    labels: { color: '#ff00ff', font: { size: 20 } }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(10, 10, 20, 0.9)',
-                    titleColor: '#ff00ff',
-                    bodyColor: '#00ff88',
-                    borderColor: '#ff00ff',
-                    borderWidth: 2
-                }
-            },
-            animation: {
-                duration: 3000,
-                easing: 'easeOutBounce',
-                onComplete: () => {
-                    gsap.to('#chart-canvas', { scale: 1.02, duration: 0.5, yoyo: true, repeat: 1 });
-                }
-            }
-        },
-        plugins: [glowPlugin]
-    });
-
-    // Time toggle functionality
-    const timeButtons = document.querySelectorAll('.time-btn');
-    timeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            timeButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const timeFrame = btn.dataset.time;
-            followerChart.data.datasets[0].data = followerData.changes[`last${timeFrame}`];
-            followerChart.update();
-            gsap.from('#chart-canvas', { 
-                scale: 0.9, 
-                opacity: 0.7, 
-                duration: 0.7, 
-                ease: 'power3.out',
-                filter: 'drop-shadow(0 0 30px rgba(255, 0, 255, 0.8))'
-            });
-        });
-    });
-</script>
+    </script>
+</body>
+</html>
