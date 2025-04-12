@@ -3,334 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Follower Analytics Dashboard</title>
+    <title>NeoFollower | Modern Analytics</title>
     <style>
         :root {
-            --primary-bg: #121212;
-            --secondary-bg: #1e1e1e;
-            --accent-color: #9c27b0;
-            --accent-light: #ba68c8;
-            --text-primary: #f5f5f5;
-            --text-secondary: #bdbdbd;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --primary-accent: #7b2cbf;
+            --secondary-accent: #9d4edd;
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --bg-gradient: radial-gradient(circle at 10% 20%, #1a1a2e 0%, #16213e 100%);
         }
-        
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--primary-bg);
-            color: var(--text-primary);
+
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
             min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1200px;
+
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
-            flex: 1;
         }
-        
-        header {
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                var(--glass-highlight) 50%,
+                transparent 100%
+            );
+            transform: rotate(30deg);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Header Styles */
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
         }
-        
+
         .logo {
-            font-size: 24px;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: var(--accent-color);
-        }
-        
-        .profile-section {
-            background-color: var(--secondary-bg);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             display: flex;
             align-items: center;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
         }
-        
-        .profile-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, transparent 100%);
-            z-index: 0;
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 2rem;
         }
-        
-        .profile-pic {
+
+        .time-filters {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-filter {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .time-filter.active {
+            background: var(--primary-accent);
+            box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card {
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .profile-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--accent-color);
-            margin-right: 20px;
-            z-index: 1;
+            border: 3px solid var(--primary-accent);
+            box-shadow: 0 4px 12px rgba(123, 44, 191, 0.4);
+            margin-right: 1.5rem;
         }
-        
+
         .profile-info {
-            z-index: 1;
+            flex: 1;
         }
-        
+
         .profile-name {
-            font-size: 22px;
-            margin: 0 0 5px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
-        
+
         .profile-handle {
             color: var(--text-secondary);
-            margin: 0 0 15px 0;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
         }
-        
+
         .profile-bio {
-            margin: 0;
+            font-size: 0.95rem;
             line-height: 1.5;
-            max-width: 600px;
+            opacity: 0.8;
         }
-        
-        .stats-container {
+
+        .stats-card {
+            padding: 1.5rem;
+            min-width: 240px;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
         }
-        
-        .stat-card {
-            background-color: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-card.total {
-            border-top: 4px solid var(--accent-color);
-        }
-        
-        .stat-card.filtered {
-            border-top: 4px solid #7e57c2;
-        }
-        
-        .stat-title {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin: 0 0 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
+
         .stat-value {
-            font-size: 32px;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin: 0;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
         .stat-change {
             display: flex;
             align-items: center;
-            margin-top: 10px;
-            font-size: 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
-        
+
         .stat-change.positive {
-            color: #66bb6a;
+            color: var(--success);
         }
-        
+
         .stat-change.negative {
-            color: #ef5350;
+            color: var(--danger);
         }
-        
+
+        /* Advanced Chart */
         .chart-container {
-            background-color: var(--secondary-bg);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            margin-top: 2rem;
         }
-        
+
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
-        
+
         .chart-title {
-            font-size: 18px;
-            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
-        
-        .time-tabs {
+
+        .chart-actions {
             display: flex;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 4px;
+            gap: 0.5rem;
         }
-        
-        .time-tab {
-            padding: 8px 16px;
-            border-radius: 6px;
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
         }
-        
-        .time-tab.active {
-            background-color: var(--accent-color);
-            color: white;
+
+        .chart-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
-        
-        .chart {
+
+        .chart-wrapper {
             height: 300px;
             position: relative;
+            margin-top: 1rem;
         }
-        
-        .chart-line {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-            stroke: var(--accent-color);
-            stroke-width: 3;
-            fill: none;
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
-        
-        .chart-area {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-            fill: url(#area-gradient);
-            opacity: 0.8;
+
+        /* Timeline */
+        .timeline-container {
+            margin-top: 2rem;
         }
-        
-        .chart-grid {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-        }
-        
-        .grid-line {
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 1;
-        }
-        
-        .chart-labels {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+
+        .timeline-header {
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
+            align-items: center;
+            margin-bottom: 1rem;
         }
-        
-        .chart-label {
-            font-size: 12px;
-            color: var(--text-secondary);
+
+        .timeline-title {
+            font-size: 1.25rem;
+            font-weight: 600;
         }
-        
-        .tooltip {
-            position: absolute;
-            background-color: rgba(30, 30, 30, 0.9);
-            border: 1px solid var(--accent-color);
-            border-radius: 8px;
-            padding: 10px;
-            pointer-events: none;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 10;
+
+        .timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
-        
-        .tooltip-value {
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-        
-        .chart-dots {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-        }
-        
-        .chart-dot {
-            fill: var(--accent-color);
-            stroke: var(--secondary-bg);
-            stroke-width: 2;
-            cursor: pointer;
+
+        .timeline-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            border-radius: 16px;
             transition: all 0.3s ease;
         }
-        
-        .chart-dot:hover {
-            fill: var(--accent-light);
-            transform: scale(1.5);
+
+        .timeline-item:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(123, 44, 191, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-time {
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            font-size: 14px;
+            margin-bottom: 0.25rem;
         }
-        
-        @media (max-width: 768px) {
+
+        .timeline-text {
+            font-size: 0.95rem;
+        }
+
+        .timeline-value {
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .positive-value {
+            color: var(--success);
+        }
+
+        .negative-value {
+            color: var(--danger);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
             .profile-section {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .profile-card {
                 flex-direction: column;
                 text-align: center;
             }
-            
-            .profile-pic {
+
+            .profile-avatar {
                 margin-right: 0;
-                margin-bottom: 15px;
+                margin-bottom: 1rem;
             }
-            
-            .stats-container {
+
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">FollowerMetrics</div>
-            <button class="btn" style="display: none;">Upgrade</button>
-        </header>
-        
-        <section class="profile-section">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile Picture" class="profile-pic">
-            <div class="profile-info">
-                <h1 class="profile-name">Alexandra Chen</h1>
-                <p class="profile-handle">@alexchen • Digital Creator</p>
-                <p class="profile-bio">Sharing my journey in design, tech and lifestyle. Building products that matter. Let's create something amazing together!</p>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">📊</span>
+                <span>NeoFollower</span>
             </div>
-        </section>
-        
-        <div class="stats-container">
-            <div class="stat-card total">
-                <h3 class="stat-title">Total Followers</h3>
-                <p class="stat-value">24,857</p>
+            <div class="time-filters">
+                <div class="time-filter">Today</div>
+                <div class="time-filter active">Week</div>
+                <div class="time-filter">Month</div>
+                <div class="time-filter">Year</div>
+            </div>
+        </header>
+
+        <section class="profile-section">
+            <div class="glass-card profile-card">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Profile" class="profile-avatar">
+                <div class="profile-info">
+                    <h1 class="profile-name">Sophia Rodriguez</h1>
+                    <p class="profile-handle">@sophiar.design • Creative Director</p>
+                    <p class="profile-bio">Digital creator & design strategist. Building brands that matter. Sharing my journey in design, tech and personal growth.</p>
+                </div>
+            </div>
+
+            <div class="glass-card stats-card">
+                <div class="stat-value">24.8K</div>
+                <div class="stat-label">Total Followers</div>
                 <div class="stat-change positive">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
                         <polyline points="22 7 12 17 2 7"></polyline>
@@ -338,10 +391,10 @@
                     +328 (1.3%) this week
                 </div>
             </div>
-            
-            <div class="stat-card filtered">
-                <h3 class="stat-title">Unfiltered Followers</h3>
-                <p class="stat-value">23,142</p>
+
+            <div class="glass-card stats-card">
+                <div class="stat-value">23.1K</div>
+                <div class="stat-label">Engaged Followers</div>
                 <div class="stat-change positive">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
                         <polyline points="22 7 12 17 2 7"></polyline>
@@ -349,126 +402,189 @@
                     +291 (1.2%) this week
                 </div>
             </div>
-            
-            <div class="stat-card">
-                <h3 class="stat-title">Engagement Rate</h3>
-                <p class="stat-value">4.8%</p>
-                <div class="stat-change negative">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; transform: rotate(180deg);">
-                        <polyline points="22 7 12 17 2 7"></polyline>
-                    </svg>
-                    -0.2% this week
+        </section>
+
+        <div class="glass-card chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Follower Growth Analytics</h2>
+                <div class="chart-actions">
+                    <button class="chart-btn">Followers</button>
+                    <button class="chart-btn">Engagement</button>
+                    <button class="chart-btn">Demographics</button>
                 </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="growthChart"></canvas>
             </div>
         </div>
-        
-        <div class="chart-container">
-            <div class="chart-header">
-                <h2 class="chart-title">Follower Growth</h2>
-                <div class="time-tabs">
-                    <div class="time-tab">24h</div>
-                    <div class="time-tab active">7d</div>
-                    <div class="time-tab">30d</div>
-                </div>
+
+        <div class="glass-card timeline-container">
+            <div class="timeline-header">
+                <h2 class="timeline-title">Recent Changes</h2>
+                <button class="chart-btn">View All</button>
             </div>
-            
-            <div class="chart">
-                <svg width="100%" height="100%" viewBox="0 0 100 80" preserveAspectRatio="none">
-                    <defs>
-                        <linearGradient id="area-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#9c27b0" stop-opacity="0.4"/>
-                            <stop offset="100%" stop-color="#9c27b0" stop-opacity="0"/>
-                        </linearGradient>
-                    </defs>
-                    
-                    <g class="chart-grid">
-                        <line x1="0" y1="20" x2="100" y2="20" class="grid-line"></line>
-                        <line x1="0" y1="40" x2="100" y2="40" class="grid-line"></line>
-                        <line x1="0" y1="60" x2="100" y2="60" class="grid-line"></line>
-                        <line x1="0" y1="80" x2="100" y2="80" class="grid-line"></line>
-                    </g>
-                    
-                    <path class="chart-area" d="M0,80 L10,60 L20,65 L30,50 L40,55 L50,40 L60,30 L70,25 L80,20 L90,15 L100,10 L100,80 Z"></path>
-                    <path class="chart-line" d="M0,80 L10,60 L20,65 L30,50 L40,55 L50,40 L60,30 L70,25 L80,20 L90,15 L100,10"></path>
-                    
-                    <g class="chart-dots">
-                        <circle cx="10" cy="60" r="3" class="chart-dot" data-value="+120"></circle>
-                        <circle cx="20" cy="65" r="3" class="chart-dot" data-value="+65"></circle>
-                        <circle cx="30" cy="50" r="3" class="chart-dot" data-value="+150"></circle>
-                        <circle cx="40" cy="55" r="3" class="chart-dot" data-value="+125"></circle>
-                        <circle cx="50" cy="40" r="3" class="chart-dot" data-value="+160"></circle>
-                        <circle cx="60" cy="30" r="3" class="chart-dot" data-value="+170"></circle>
-                        <circle cx="70" cy="25" r="3" class="chart-dot" data-value="+175"></circle>
-                        <circle cx="80" cy="20" r="3" class="chart-dot" data-value="+180"></circle>
-                        <circle cx="90" cy="15" r="3" class="chart-dot" data-value="+185"></circle>
-                        <circle cx="100" cy="10" r="3" class="chart-dot" data-value="+190"></circle>
-                    </g>
-                </svg>
-                
-                <div class="chart-labels">
-                    <span class="chart-label">Mon</span>
-                    <span class="chart-label">Tue</span>
-                    <span class="chart-label">Wed</span>
-                    <span class="chart-label">Thu</span>
-                    <span class="chart-label">Fri</span>
-                    <span class="chart-label">Sat</span>
-                    <span class="chart-label">Sun</span>
+            <div class="timeline-list">
+                <div class="timeline-item">
+                    <div class="timeline-icon">↑</div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">2 hours ago</div>
+                        <div class="timeline-text">New followers from your latest post <span class="timeline-value positive-value">+142</span></div>
+                    </div>
                 </div>
-                
-                <div class="tooltip"></div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">↓</div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">5 hours ago</div>
+                        <div class="timeline-text">Inactive followers removed <span class="timeline-value negative-value">-28</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">↑</div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">Yesterday</div>
+                        <div class="timeline-text">Viral reach from @designinspo mention <span class="timeline-value positive-value">+387</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">↑</div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">2 days ago</div>
+                        <div class="timeline-text">New followers from story engagement <span class="timeline-value positive-value">+89</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
-    <footer>
-        © 2023 FollowerMetrics • All rights reserved
-    </footer>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Interactive chart functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const dots = document.querySelectorAll('.chart-dot');
-            const tooltip = document.querySelector('.tooltip');
-            const timeTabs = document.querySelectorAll('.time-tab');
-            
-            // Tooltip interaction
-            dots.forEach(dot => {
-                dot.addEventListener('mouseenter', function(e) {
-                    const value = this.getAttribute('data-value');
-                    const x = e.clientX;
-                    const y = e.clientY;
-                    
-                    tooltip.innerHTML = `<span class="tooltip-value">${value}</span> new followers`;
-                    tooltip.style.left = `${x}px`;
-                    tooltip.style.top = `${y - 40}px`;
-                    tooltip.style.opacity = '1';
-                });
-                
-                dot.addEventListener('mouseleave', function() {
-                    tooltip.style.opacity = '0';
-                });
-            });
-            
-            // Time tab switching
-            timeTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    timeTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Here you would typically fetch new data based on the selected time period
-                    // For this demo, we're just showing the same chart
-                });
-            });
-            
-            // Mobile responsive adjustments
-            function handleResize() {
-                if (window.innerWidth < 768) {
-                    // Adjustments for mobile
+        // Advanced Chart Configuration
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        
+        // Generate gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(123, 44, 191, 0.4)');
+        gradient.addColorStop(1, 'rgba(123, 44, 191, 0)');
+        
+        const growthChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Total Followers',
+                    data: [18500, 19500, 21000, 22000, 23000, 23500, 24800],
+                    borderColor: '#7b2cbf',
+                    borderWidth: 3,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#7b2cbf',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }, {
+                    label: 'Engaged Followers',
+                    data: [17200, 18200, 19500, 20300, 21200, 21800, 23100],
+                    borderColor: '#9d4edd',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#9d4edd',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 12
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 30, 45, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: 'rgba(255, 255, 255, 0.7)',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y.toLocaleString();
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            borderColor: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            borderColor: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function(value) {
+                                return value >= 1000 ? (value/1000) + 'k' : value;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear',
+                        from: 0.5,
+                        to: 0.4,
+                        loop: false
+                    }
                 }
             }
-            
-            window.addEventListener('resize', handleResize);
-            handleResize();
+        });
+
+        // Time filter functionality
+        const timeFilters = document.querySelectorAll('.time-filter');
+        timeFilters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                timeFilters.forEach(f => f.classList.remove('active'));
+                filter.classList.add('active');
+                
+                // Here you would update the chart data based on the selected time period
+                // For demo purposes, we'll just animate the chart
+                growthChart.update();
+            });
         });
     </script>
 </body>
