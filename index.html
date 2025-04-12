@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farcaster Mini-App - Epic Dashboard</title>
+    <!-- Google Fonts (Inter for a sleek look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1e2f, #2a2a4a);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: #2e2e4a;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle background effect */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.2), transparent);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        /* Profile section */
+        .profile {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .profile img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 5px solid #00ff88;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .profile h2 {
+            font-size: 26px;
+            margin: 15px 0 5px;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .profile p {
+            font-size: 16px;
+            color: #ccc;
+        }
+
+        /* Followers section */
+        .followers {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .follower-box {
+            background: #3a3a5a;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 150px;
+            transition: transform 0.3s ease;
+        }
+
+        .follower-box:hover {
+            transform: translateY(-5px);
+            background: #4a4a6a;
+        }
+
+        .follower-box h3 {
+            font-size: 18px;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .follower-box p {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Chart section */
+        .charts {
+            background: #3a3a5a;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .charts h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .profile img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .profile h2 {
+                font-size: 22px;
+            }
+
+            .follower-box {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile section -->
+        <div class="profile">
+            <img src="https://via.placeholder.com/130" alt="Profile Picture">
+            <h2>Epic Farcaster User</h2>
+            <p>Write a cool bio for yourself!</p>
+        </div>
+
+        <!-- Followers section -->
+        <div class="followers">
+            <div class="follower-box">
+                <h3>Real Followers</h3>
+                <p id="real-followers">0</p>
+            </div>
+            <div class="follower-box">
+                <h3>Filtered Followers</h3>
+                <p id="filtered-followers">0</p>
+            </div>
+        </div>
+
+        <!-- Chart section -->
+        <div class="charts">
+            <h3>Follower Changes</h3>
+            <canvas id="follower-chart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Mock data (replace with API data if available)
+        const followerData = {
+            realFollowers: 1250,
+            filteredFollowers: 1100,
+            changes: {
+                last24h: [1200, 1210, 1220, 1230, 1240, 1250],
+                last7d: [1100, 1120, 1150, 1180, 1200, 1220, 1250],
+                last30d: [1000, 1050, 1080, 1100, 1150, 1200, 1250]
+            }
+        };
+
+        // Update follower counts
+        document.getElementById('real-followers').textContent = followerData.realFollowers;
+        document.getElementById('filtered-followers').textContent = followerData.filteredFollowers;
+
+        // Setup chart with Chart.js
+        const ctx = document.getElementById('follower-chart').getContext('2d');
+        const followerChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
+                datasets: [
+                    {
+                        label: 'Real Followers',
+                        data: followerData.changes.last30d,
+                        borderColor: '#00ff88',
+                        backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: { color: '#ccc' }
+                    },
+                    x: {
+                        ticks: { color: '#ccc' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#fff' }
+                    }
+                }
+            }
+        });
+
+        // Animate follower counts on load
+        function animateValue(id, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                document.getElementById(id).textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        animateValue('real-followers', 0, followerData.realFollowers, 2000);
+        animateValue('filtered-followers', 0, followerData.filteredFollowers, 2000);
+    </script>
+</body>
+</html>
