@@ -3,375 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farcaster Mini-App - Chart Legend</title>
-    <!-- Google Fonts: Rajdhani -->
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <title>Interactive Mini-App</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
         body {
-            background: #00ff88; /* Solid neon green */
-            color: #fff;
+            background-color: #1c2526;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
         }
-
         .container {
-            background: rgba(10, 10, 20, 0.9);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 1100px;
+            max-width: 600px;
             width: 100%;
-            box-shadow: 0 0 60px rgba(255, 0, 255, 0.5); /* Pink glow */
-            position: relative;
+            background-color: #2c3539;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-
-        /* Neon pink border */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
-            border-radius: 30px;
-            background: linear-gradient(90deg, #ff00ff, #00ff88, #ff00ff);
-            filter: blur(8px);
-            animation: neonPulse 3s infinite linear;
-            z-index: -1;
-        }
-
-        @keyframes neonPulse {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        /* Profile section */
-        .profile {
+        .profile-section {
             text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .profile-pic {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 6px solid #ff00ff;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.6));
-        }
-
-        .profile-pic:hover {
-            transform: scale(1.1);
-            border-color: #00ff88;
-        }
-
-        .profile h2 {
-            font-size: 36px;
-            margin: 25px 0 10px;
-            color: #ff00ff;
-            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .profile p {
-            font-size: 20px;
-            color: #00ff88;
-            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
-        }
-
-        /* Followers section */
-        .followers {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 60px;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-
-        .follower-box {
-            background: rgba(20, 20, 40, 0.9);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            min-width: 200px;
-            transition: transform 0.3s ease;
-        }
-
-        .follower-box:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
-        }
-
-        .follower-box h3 {
-            font-size: 22px;
-            color: #ff00ff;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-
-        .follower-box p {
-            font-size: 32px;
-            font-weight: 700;
-            color: #00ff88;
-        }
-
-        /* Chart section */
-        .charts {
-            background: rgba(20, 20, 50, 0.9);
-            padding: 40px;
-            border-radius: 25px;
-            margin-top: 40px;
-        }
-
-        .charts h3 {
-            font-size: 30px;
-            margin-bottom: 30px;
-            color: #ff00ff;
-            text-shadow: 0 0 12px rgba(255, 0, 255, 0.7);
-            text-align: center;
-        }
-
-        .time-toggle {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
             margin-bottom: 20px;
         }
-
-        .time-btn {
-            background: rgba(255, 0, 255, 0.2);
-            border: 2px solid #ff00ff;
-            color: #ff00ff;
-            padding: 10px 20px;
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4a5e6a;
+            margin-bottom: 10px;
+        }
+        .username {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+        .follower-count {
+            font-size: 1.2em;
+            color: #b0bec5;
+            margin: 10px 0;
+        }
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .stat-box {
+            background-color: #37474f;
+            padding: 15px;
             border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: all 0.3s ease;
+            text-align: center;
         }
-
-        .time-btn:hover, .time-btn.active {
-            background: #ff00ff;
-            color: #00ff88;
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.7);
+        .stat-box h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #90a4ae;
         }
-
-        #chart-canvas {
+        .stat-box p {
+            margin: 5px 0 0;
+            font-size: 1.4em;
+            color: #e0e0e0;
+        }
+        .chart-section {
+            margin-top: 20px;
+        }
+        canvas {
             max-width: 100%;
-            filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.4));
         }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px;
-            }
-
-            .profile-pic {
-                width: 140px;
-                height: 140px;
-            }
-
-            .profile h2 {
-                font-size: 28px;
-            }
-
-            .follower-box {
-                min-width: 160px;
-            }
-
-            .charts h3 {
-                font-size: 24px;
-            }
+        .btn {
+            background-color: #546e7a;
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #455a64;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Profile section -->
-        <div class="profile">
-            <img class="profile-pic" src="https://via.placeholder.com/180" alt="Profile Picture">
-            <h2>Farcaster Chart Master</h2>
-            <p>Owning the social universe with neon swagger.</p>
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/100" alt="Profile" class="profile-pic">
+            <div class="username">Sample User</div>
+            <div class="follower-count">Followers: <span id="follower-count">12,345</span></div>
+            <button class="btn" onclick="updateFollowers()">Update Followers</button>
         </div>
-
-        <!-- Followers section -->
-        <div class="followers">
-            <div class="follower-box">
-                <h3>Real Followers</h3>
-                <p id="real-followers">0</p>
+        <div class="stats-section">
+            <div class="stat-box">
+                <h3>24h Change</h3>
+                <p id="change-24h">+120</p>
             </div>
-            <div class="follower-box">
-                <h3>Filtered Followers</h3>
-                <p id="filtered-followers">0</p>
+            <div class="stat-box">
+                <h3>7d Change</h3>
+                <p id="change-7d">+450</p>
+            </div>
+            <div class="stat-box">
+                <h3>30d Change</h3>
+                <p id="change-30d">+1,230</p>
             </div>
         </div>
-
-        <!-- Chart section -->
-        <div class="charts">
-            <h3>Follower Explosion</h3>
-            <div class="time-toggle">
-                <button class="time-btn active" data-time="24h">24H</button>
-                <button class="time-btn" data-time="7d">7D</button>
-                <button class="time-btn" data-time="30d">30D</button>
-            </div>
-            <canvas id="chart-canvas"></canvas>
+        <div class="chart-section">
+            <canvas id="followerChart"></canvas>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        console.log("Loading Farcaster Mini-App...");
-
-        // Mock data
-        const followerData = {
-            realFollowers: 15000,
-            filteredFollowers: 13800,
-            changes: {
-                last24h: [14500, 14600, 14750, 14900, 14950, 15000],
-                last7d: [13500, 13800, 14000, 14200, 14500, 14700, 15000],
-                last30d: [12000, 12500, 13000, 13500, 14000, 14500, 15000]
-            }
-        };
-
-        // GSAP animations
-        try {
-            gsap.from('.container', { scale: 0.8, opacity: 0, duration: 1.5, ease: 'power4.out' });
-            gsap.from('.profile-pic', { y: -200, opacity: 0, duration: 1, ease: 'bounce.out', delay: 0.5 });
-            gsap.from('.profile h2', { x: -150, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.7 });
-            gsap.from('.profile p', { x: 150, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.9 });
-            gsap.from('.follower-box', { scale: 0, opacity: 0, duration: 1, stagger: 0.2, ease: 'elastic.out(1, 0.5)', delay: 1 });
-            gsap.from('.charts', { y: 200, opacity: 0, duration: 1, ease: 'power4.out', delay: 1.2 });
-            gsap.fromTo(
-                '#real-followers',
-                { innerText: 0 },
-                { innerText: followerData.realFollowers, duration: 2, ease: 'power2.out', snap: { innerText: 1 } }
-            );
-            gsap.fromTo(
-                '#filtered-followers',
-                { innerText: 0 },
-                { innerText: followerData.filteredFollowers, duration: 2, ease: 'power2.out', snap: { innerText: 1 } }
-            );
-            console.log("GSAP animations loaded successfully.");
-        } catch (e) {
-            console.error("GSAP error:", e);
-        }
-
-        // Custom Chart.js plugin for particle effects
-        const particlePlugin = {
-            id: 'particlePlugin',
-            beforeDraw(chart) {
-                const ctx = chart.ctx;
-                const meta = chart.getDatasetMeta(0);
-                meta.data.forEach(point => {
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(point.x, point.y, 15, 0, 2 * Math.PI);
-                    ctx.fillStyle = 'rgba(255, 0, 255, 0.2)';
-                    ctx.fill();
-                    // Mini particles
-                    for (let i = 0; i < 3; i++) {
-                        const angle = Math.random() * 2 * Math.PI;
-                        const dist = Math.random() * 10 + 5;
-                        ctx.beginPath();
-                        ctx.arc(point.x + Math.cos(angle) * dist, point.y + Math.sin(angle) * dist, 2, 0, 2 * Math.PI);
-                        ctx.fillStyle = 'rgba(0, 255, 136, 0.5)';
-                        ctx.fill();
-                    }
-                    ctx.restore();
-                });
-            }
-        };
-
-        // Chart setup
-        try {
-            Chart.register(particlePlugin);
-            const ctx = document.getElementById('chart-canvas').getContext('2d');
-            let followerChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['6h ago', '12h ago', '18h ago', '24h ago', '7d ago', '30d ago'],
-                    datasets: [
-                        {
-                            label: 'Real Followers',
-                            data: followerData.changes.last24h,
-                            borderColor: '#ff00ff',
-                            backgroundColor: 'rgba(255, 0, 255, 0.4)',
-                            fill: true,
-                            tension: 0.7,
-                            pointBackgroundColor: '#00ff88',
-                            pointBorderColor: '#fff',
-                            pointRadius: 10,
-                            pointHoverRadius: 15
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: { 
-                                color: '#00ff88', 
-                                font: { size: 16 },
-                                callback: value => value.toLocaleString()
-                            },
-                            grid: { color: 'rgba(255, 0, 255, 0.3)' }
-                        },
-                        x: {
-                            ticks: { color: '#00ff88', font: { size: 16 } },
-                            grid: { color: 'rgba(255, 0, 255, 0.3)' }
-                        }
+        const ctx = document.getElementById('followerChart').getContext('2d');
+        const followerChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['30 days ago', '25 days', '20 days', '15 days', '10 days', '5 days', 'Today'],
+                datasets: [{
+                    label: 'Follower Count',
+                    data: [11000, 11200, 11500, 11700, 11900, 12100, 12345],
+                    borderColor: '#546e7a',
+                    backgroundColor: 'rgba(84, 110, 122, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: { color: '#b0bec5' },
+                        grid: { color: '#455a64' }
                     },
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ff00ff', font: { size: 18 } }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(10, 10, 20, 0.9)',
-                            titleColor: '#ff00ff',
-                            bodyColor: '#00ff88',
-                            borderColor: '#ff00ff',
-                            borderWidth: 2
-                        }
-                    },
-                    animation: {
-                        duration: 2500,
-                        easing: 'easeOutElastic'
+                    x: {
+                        ticks: { color: '#b0bec5' },
+                        grid: { color: '#455a64' }
                     }
                 },
-                plugins: [particlePlugin]
-            });
+                plugins: {
+                    legend: { labels: { color: '#b0bec5' } }
+                }
+            }
+        });
 
-            // Time toggle
-            const timeButtons = document.querySelectorAll('.time-btn');
-            timeButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    timeButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    const timeFrame = btn.dataset.time;
-                    followerChart.data.datasets[0].data = followerData.changes[`last${timeFrame}`];
-                    followerChart.update();
-                    gsap.from('#chart-canvas', { scale: 0.95, opacity: 0.8, duration: 0.5, ease: 'power3.out' });
-                });
-            });
+        function updateFollowers() {
+            const newCount = Math.floor(Math.random() * 1000) + 12000;
+            const change24h = Math.floor(Math.random() * 200) - 100;
+            const change7d = Math.floor(Math.random() * 500) - 200;
+            const change30d = Math.floor(Math.random() * 2000) - 500;
 
-            console.log("Chart loaded successfully.");
-        } catch (e) {
-            console.error("Chart error:", e);
+            document.getElementById('follower-count').textContent = newCount.toLocaleString();
+            document.getElementById('change-24h').textContent = (change24h >= 0 ? '+' : '') + change24h;
+            document.getElementById('change-7d').textContent = (change7d >= 0 ? '+' : '') + change7d;
+            document.getElementById('change-30d').textContent = (change30d >= 0 ? '+' : '') + change30d;
+
+            followerChart.data.datasets[0].data = [
+                newCount - change30d,
+                newCount - change30d + 200,
+                newCount - change7d,
+                newCount - change7d + 200,
+                newCount - change24h,
+                newCount
+            ];
+            followerChart.update();
         }
     </script>
 </body>
